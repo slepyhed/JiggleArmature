@@ -129,7 +129,8 @@ class JiggleBone(bpy.types.PropertyGroup):
     Kld = bpy.props.FloatProperty(name = "linear damping",min=0.0, max=1.0,default = 0.01, update = funp("Kld"))
     Kd = bpy.props.FloatProperty(name = "angular damping",min=0.0, max=1.0,default = 0.01, update = funp("Kd"))
     Ks = bpy.props.FloatProperty(name = "stiffness",min=0.0 , max = 1.0, default = 0.8, update = funp("Ks"))
-    mass = bpy.props.FloatProperty(min=0.0001, default = 1.0, update = funp("mass"))  
+    mass = bpy.props.FloatProperty(min=0.0001, default = 1.0, update = funp("mass"))
+    grav = bpy.props.FloatProperty(name = "gravity",min=0.0 , max = 1.0, default = 1.0, update = funp("grav"))
     #M = bpy.props.FloatVectorProperty(size=9,subtype='MATRIX')    
     R = bpy.props.FloatVectorProperty(name="rotation", size=4,subtype='QUATERNION')
     W = bpy.props.FloatVectorProperty(size=3,subtype='XYZ')
@@ -217,7 +218,8 @@ class JiggleBonePanel(bpy.types.Panel):
             col.prop(bon.jiggle,"Ks")   
             col.prop(bon.jiggle,"Kd")  
             col.prop(bon.jiggle,"Kld")             
-            col.prop(bon.jiggle,"mass")  
+            col.prop(bon.jiggle,"mass")
+            col.prop(bon.jiggle,"grav")            
             col.prop(bon.jiggle,"debug")
             col.prop(bon.jiggle,"control")
             col.prop(bon.jiggle,"control_bone")
@@ -464,7 +466,7 @@ def step(scene):
                         wb.w = 1.0/Jb.mass
                         wb.k = 1- pow(1-Jb.Ks, 1/scene.jiggle.iterations)
                         Jb.V*= 1.0-Jb.Kld
-                        Jb.V+= scene.gravity*dt
+                        Jb.V+= scene.gravity*dt*Jb.grav
                         Jb.W*= 1.0-Jb.Kd
                         R = Jb.R.to_matrix()
                         wb.R = R.normalized()
